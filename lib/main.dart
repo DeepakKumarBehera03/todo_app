@@ -37,16 +37,12 @@ class _TodoListState extends State<TodoList> {
     _tasksCompleted = List<bool>.generate(_tasks.length, (index) => false);
   }
 
-
-
   void _addTask(String task) {
     setState(() {
       _tasks.add(task);
-      _tasksCompleted.add(false); // Add false for the new task
+      _tasksCompleted.add(false);
     });
   }
-
-
 
   void _removeTask(int index) {
     setState(() {
@@ -59,71 +55,143 @@ class _TodoListState extends State<TodoList> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Todo List'),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.white24, Colors.cyanAccent[100]!],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+        ),
+        actions: [
+          IconButton(
+              onPressed: (){
+              },
+              icon: const Icon(Icons.search))
+        ],
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration:  BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.purple[100]!,
-              Colors.cyan[100]!
+              Colors.white,
+              Colors.cyanAccent[100]!
             ],
             begin: Alignment.topLeft,
-            end: Alignment.bottomRight
+            end: Alignment.bottomCenter
           )
         ),
           child: _buildTaskList(context)),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final task = await showDialog<String>(
-            context: context,
-            builder: (BuildContext context) {
-              return SimpleDialog(
-                title: const Text('Add Task'),
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: TextField(
-                      controller: _taskController,
-                      decoration: const InputDecoration(
-                        labelText: 'Task',
-                      ),
-                      onSubmitted: (value) {
-                        // Handle form submission here if needed
-                      },
-                    ),
+      floatingActionButton: _buildFloatingActionButton(context),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      drawer: _buildDrawer(context),
+    );
+  }
+
+  FloatingActionButton _buildFloatingActionButton(BuildContext context) {
+    return FloatingActionButton(
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black,
+      onPressed: () async {
+        final task = await showDialog<String>(
+          context: context,
+          builder: (BuildContext context) {
+            return _simpleDialog(context);
+          },
+        );
+        if (task != null) {
+          _addTask(task);
+        }
+      },
+      child: const Icon(Icons.add,color: Colors.black,),
+    );
+  }
+
+  SimpleDialog _simpleDialog(BuildContext context) {
+    return SimpleDialog(
+            title: const Text('Add Task'),
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  controller: _taskController,
+                  decoration: const InputDecoration(
+                    labelText: 'Task',
                   ),
-                  ButtonBar(
-                    children: <Widget>[
-                      ElevatedButton(
-                        child: const Text('Cancel'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      ElevatedButton(
-                        child: Text('Add'),
-                        onPressed: () {
-                          // Retrieve the task entered by the user
-                          String task = _taskController.text;
-                          // Add the task to the list
-                          _addTask(task);
-                          // Clear the text field
-                          _taskController.clear();
-                          // Close the dialog
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
+                  onSubmitted: (value) {
+                    // Handle form submission here if needed
+                  },
+                ),
+              ),
+              ButtonBar(
+                children: <Widget>[
+                  ElevatedButton(
+                    child: const Text('Cancel'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  ElevatedButton(
+                    child: const Text('Add'),
+                    onPressed: () {
+                      // Retrieve the task entered by the user
+                      String task = _taskController.text;
+                      // Add the task to the list
+                      _addTask(task);
+                      // Clear the text field
+                      _taskController.clear();
+                      // Close the dialog
+                      Navigator.of(context).pop();
+                    },
                   ),
                 ],
-              );
-            },
+              ),
+            ],
           );
-          if (task != null) {
-            _addTask(task);
-          }
-        },
-        child: const Icon(Icons.add),
+  }
+
+  Drawer _buildDrawer(BuildContext context) {
+    return Drawer(
+      backgroundColor: Colors.cyanAccent[100],
+      elevation: double.infinity,
+      child: ListView(
+        children: <Widget>[
+          const UserAccountsDrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.black,
+            ),
+            arrowColor: Colors.black,
+            accountName:  Text('Deepak Kumar Behera'),
+            accountEmail:  Text('Deepakjgrt99@gmail.com'),
+            currentAccountPicture: CircleAvatar(
+              backgroundImage: NetworkImage(
+                'https://t4.ftcdn.net/jpg/05/31/37/89/240_F_531378938_xwRjN9e5ramdPj2coDwHrwk9QHckVa5Y.jpg',
+              ),
+            ),
+          ),
+          ListTile(
+            title: const Text('Home'),
+            leading: const Icon(Icons.home),
+            onTap: () {
+              Navigator.of(context).pop();
+            }
+          ),
+          ListTile(
+            title: const Text('Settings'),
+            leading: const Icon(Icons.settings),
+            onTap: () {
+              Navigator.of(context).pop();
+
+            },
+          ),
+          ListTile(
+            title: const Text('About'),
+            leading: const Icon(Icons.info),
+            onTap: () {
+              Navigator.of(context).pop();
+            }),
+        ],
       ),
     );
   }
